@@ -1,0 +1,10 @@
+D:\VisualStudioCS\CoCaRo\CoCaRo\bin\Debug\CoCaRo.exe.config
+D:\VisualStudioCS\CoCaRo\CoCaRo\bin\Debug\CoCaRo.exe
+D:\VisualStudioCS\CoCaRo\CoCaRo\bin\Debug\CoCaRo.pdb
+D:\VisualStudioCS\CoCaRo\CoCaRo\obj\Debug\CoCaRo.csprojAssemblyReference.cache
+D:\VisualStudioCS\CoCaRo\CoCaRo\obj\Debug\CoCaRo.Form1.resources
+D:\VisualStudioCS\CoCaRo\CoCaRo\obj\Debug\CoCaRo.Properties.Resources.resources
+D:\VisualStudioCS\CoCaRo\CoCaRo\obj\Debug\CoCaRo.csproj.GenerateResource.cache
+D:\VisualStudioCS\CoCaRo\CoCaRo\obj\Debug\CoCaRo.csproj.CoreCompileInputs.cache
+D:\VisualStudioCS\CoCaRo\CoCaRo\obj\Debug\CoCaRo.exe
+D:\VisualStudioCS\CoCaRo\CoCaRo\obj\Debug\CoCaRo.pdb
