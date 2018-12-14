@@ -18,10 +18,10 @@ namespace CoCaRo
         private TextBox playerName;
         private PictureBox playerMark;
         private List<List<Button>> matrix;
-        private event EventHandler playerMarked;
+        private event EventHandler<ButtonClickEvent> playerMarked;
         private event EventHandler endedGame;
 
-        public event EventHandler PlayerMarked
+        public event EventHandler<ButtonClickEvent> PlayerMarked
         {
             add
             {
@@ -63,13 +63,17 @@ namespace CoCaRo
                 new Player("Mai", Image.FromFile(Application.StartupPath + "\\Resources\\dau-x.png"))
             };
 
-            CurrentPlayer = 0;
-            ChangePlayer();
+           
         }
         #endregion
         #region Methods
         public void DrawChessBoard()
         {
+            chessBoard.Enabled = true;
+            chessBoard.Controls.Clear();
+            CurrentPlayer = 0;
+            ChangePlayer();
+
             Matrix = new List<List<Button>>();
             Button oldBtn = new Button() { Width = 0, Location = new Point(0, 0) };
             for(int i = 0; i< Cons.CHESS_BOARD_SIZE; i++)
@@ -102,6 +106,25 @@ namespace CoCaRo
             Button btn = sender as Button;
             if (btn.BackgroundImage != null)
                 return;
+            Mark(btn);
+            ChangePlayer();
+
+            if (playerMarked != null)
+                playerMarked(this, new ButtonClickEvent(GetChessPoint(btn)));
+
+            if (isEndGame(btn))
+            {
+                EndGame();
+            }
+        }
+
+        public void OtherPlayerMark(Point point)
+        {
+            Button btn = Matrix[point.X][point.Y];
+            if (btn.BackgroundImage != null)
+                return;
+            //ChessBoard.Enabled = true;
+
             Mark(btn);
             ChangePlayer();
             if (isEndGame(btn))
@@ -230,10 +253,9 @@ namespace CoCaRo
         }
         public void EndGame()
         {
+            //MessageBox.Show("win");
             if (endedGame != null)
-            {
                 endedGame(this, new EventArgs());
-            }
         }
         void Mark(Button btn)
         {
@@ -245,7 +267,24 @@ namespace CoCaRo
             PlayerName.Text = Players[CurrentPlayer].Name;
             PlayerMark.Image = Players[CurrentPlayer].Mark;
         }
+
+        public bool undo()
+        {
+            return false;
+        }
+
         #endregion
 
+    }
+    public class ButtonClickEvent : EventArgs
+    {
+        private Point clickedPoint;
+
+        public Point ClickedPoint { get => clickedPoint; set => clickedPoint = value; }
+
+        public ButtonClickEvent(Point point)
+        {
+            this.clickedPoint = point;
+        }
     }
 }
