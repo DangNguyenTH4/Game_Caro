@@ -16,7 +16,7 @@ namespace CoCaRo
     {
         ChessBoardManager ChessBoard;
         SocketManager socket;
-
+        bool myTurn = true;
 
         public Form1()
         {
@@ -41,12 +41,19 @@ namespace CoCaRo
 
         private void ChessBoard_PlayerMarked(object sender, ButtonClickEvent e)
         {
-            pnlChessBoard.Enabled = false;
+            DisableChessBoard();
+            StartTimer();
+            ResetProgessBar(Cons.COOL_DOWN_TIME);
+            
+            try
+            {
+                socket.Send(new SocketData((int)SocketCommand.SEND_POINT, "Hihihi", e.ClickedPoint));
+            }
+            catch
+            {
 
-            tmCoolDown.Start();
-            prgbCountDown.Value = Cons.COOL_DOWN_TIME;
-
-            socket.Send(new SocketData((int)SocketCommand.SEND_POINT,"Hihihi",e.ClickedPoint));
+            }
+            NotMyTurn();
             Listen();
         }
 
@@ -61,7 +68,7 @@ namespace CoCaRo
             if (prgbCountDown.Value <= 0)
             {
                 //tmCoolDown.Stop();
-                EndGame();
+                TimeOut();
             }
 
         }
@@ -72,15 +79,37 @@ namespace CoCaRo
         }
 
         #region Menustrip_Menu
-
+        private void TimeOut()
+        {
+            //if(ChessBoard.CurrentPlayer)
+            StopTimer();
+            DisableChessBoard();
+            if (myTurn)
+            {
+                MessageBox.Show("Ban da het gio");
+            }
+            else
+            {
+                MessageBox.Show("Doi thu da het gio");
+            }
+        }
         private void EndGame()
         {
-            tmCoolDown.Stop();
-            pnlChessBoard.Enabled = false;
-            MessageBox.Show("End");
+            StopTimer();
+            DisableChessBoard();
+            if (myTurn)
+            {
+                MessageBox.Show("You Win");
+            }
+            else
+            {
+                MessageBox.Show("You Lose");
+            }
         }
         void NewGame()
         {
+            StopTimer();
+            ResetProgessBar(Cons.COOL_DOWN_TIME);
             ChessBoard.DrawChessBoard();
         }
         void Quit()
@@ -94,9 +123,14 @@ namespace CoCaRo
 
         private void newGameToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            tmCoolDown.Stop();
-            prgbCountDown.Value = Cons.COOL_DOWN_TIME;
+            
             NewGame();
+            EnableChessBoard();
+            try
+            {
+                socket.Send(new SocketData((int)SocketCommand.NEW_GAME, "Hihihi", new Point()));
+            }
+            catch { }
         }
 
         private void undoToolStripMenuItem_Click(object sender, EventArgs e)
@@ -110,12 +144,22 @@ namespace CoCaRo
         }
         #endregion
 
-       
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (MessageBox.Show("Really quit?", "Infomation", MessageBoxButtons.OKCancel) != DialogResult.OK)
                 e.Cancel = true;
+            else
+            {
+                try
+                {
+                    socket.Send(new SocketData((int)SocketCommand.QUIT, "", new Point()));
+                }
+                catch
+                {
+
+                }
+            }
         }
         private void Form1_Shown(object sender, EventArgs e)
         {
@@ -131,13 +175,13 @@ namespace CoCaRo
             if (!socket.ConnectServer())
             {
                 socket.IsServer = true;
-                pnlChessBoard.Enabled = true;
+                EnableChessBoard();
                 socket.CreateServer();
             }
             else
             {
                 socket.IsServer = false;
-                pnlChessBoard.Enabled = false;
+                DisableChessBoard();
                 Listen();
                 //socket.Send(new SocketData((int)SocketCommand.NOTYFI,"Da ket noi",null));
             }
@@ -174,18 +218,29 @@ namespace CoCaRo
                     MessageBox.Show(data.Message);
                     break;
                 case (int)SocketCommand.NEW_GAME:
+                    this.Invoke((MethodInvoker)(() =>
+                    {
+                        NewGame();
+                    }));
+                    DisableChessBoard();
+
                     break;
                 case (int)SocketCommand.END_GAME:
                     break;
+                case (int)SocketCommand.TIME_OUT:
+                    break;
                 case (int)SocketCommand.QUIT:
+                    StopTimer();
+                    MessageBox.Show("Nguoi choi da thoat");
                     break;
                 case (int)SocketCommand.SEND_POINT:
                     this.Invoke((MethodInvoker)(() =>
                     {
-                        tmCoolDown.Start();
-                        pnlChessBoard.Enabled = true;
+                        StartTimer();
+                        EnableChessBoard();
                         ChessBoard.OtherPlayerMark(data.Point);
-                        prgbCountDown.Value = Cons.COOL_DOWN_TIME;
+                        ResetProgessBar(Cons.COOL_DOWN_TIME);
+                        ItsMyTurn();
                     }));
                     
                     break;
@@ -195,6 +250,35 @@ namespace CoCaRo
                     break;
             }
             Listen();
+        }
+
+        private void ItsMyTurn()
+        {
+            myTurn = true;
+        }
+        private void NotMyTurn()
+        {
+            myTurn = false;
+        }
+        private void StartTimer()
+        {
+            tmCoolDown.Start();
+        }
+        private void StopTimer()
+        {
+            tmCoolDown.Stop();
+        }
+        private void EnableChessBoard()
+        {
+            pnlChessBoard.Enabled = true;
+        }
+        private void DisableChessBoard()
+        {
+            pnlChessBoard.Enabled = false;
+        }
+        private void ResetProgessBar(int value)
+        {
+            prgbCountDown.Value = value;
         }
     }
 }

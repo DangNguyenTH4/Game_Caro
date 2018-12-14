@@ -33,6 +33,7 @@ namespace CoCaRo
         NOTYFI,
         NEW_GAME,
         END_GAME,
+        TIME_OUT,
         UNDO,
         QUIT
     }
