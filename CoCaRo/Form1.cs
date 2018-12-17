@@ -16,7 +16,9 @@ namespace CoCaRo
     {
         ChessBoardManager ChessBoard;
         SocketManager socket;
-        bool myTurn = true;
+        bool myTurn;
+
+        public bool MyTurn { get => myTurn; set => myTurn = value; }
 
         public Form1()
         {
@@ -84,7 +86,7 @@ namespace CoCaRo
             //if(ChessBoard.CurrentPlayer)
             StopTimer();
             DisableChessBoard();
-            if (myTurn)
+            if (MyTurn)
             {
                 MessageBox.Show("Ban da het gio");
             }
@@ -97,13 +99,13 @@ namespace CoCaRo
         {
             StopTimer();
             DisableChessBoard();
-            if (myTurn)
+            if (!MyTurn)
             {
-                MessageBox.Show("You Win");
+                Winner();
             }
             else
             {
-                MessageBox.Show("You Lose");
+                Loser();
             }
         }
         void NewGame()
@@ -226,6 +228,7 @@ namespace CoCaRo
 
                     break;
                 case (int)SocketCommand.END_GAME:
+                    //NotMyTurn();
                     break;
                 case (int)SocketCommand.TIME_OUT:
                     break;
@@ -238,9 +241,9 @@ namespace CoCaRo
                     {
                         StartTimer();
                         EnableChessBoard();
+                        ItsMyTurn();
                         ChessBoard.OtherPlayerMark(data.Point);
                         ResetProgessBar(Cons.COOL_DOWN_TIME);
-                        ItsMyTurn();
                     }));
                     
                     break;
@@ -252,13 +255,21 @@ namespace CoCaRo
             Listen();
         }
 
+        private void Winner()
+        {
+            MessageBox.Show("You Win");
+        }
+        private void Loser()
+        {
+            MessageBox.Show("You Lose");
+        }
         private void ItsMyTurn()
         {
-            myTurn = true;
+            MyTurn = true;
         }
         private void NotMyTurn()
         {
-            myTurn = false;
+            MyTurn = false;
         }
         private void StartTimer()
         {

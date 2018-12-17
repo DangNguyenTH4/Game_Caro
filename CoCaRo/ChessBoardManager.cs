@@ -116,6 +116,8 @@ namespace CoCaRo
             {
                 EndGame();
             }
+
+
         }
 
         public void OtherPlayerMark(Point point)
@@ -266,6 +268,7 @@ namespace CoCaRo
         {
             PlayerName.Text = Players[CurrentPlayer].Name;
             PlayerMark.Image = Players[CurrentPlayer].Mark;
+            
         }
 
         public bool undo()
